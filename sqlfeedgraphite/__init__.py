@@ -3,32 +3,25 @@ import os
 import socket
 import sys
 import time
+import json
 
 import sqlalchemy
 
-def get_executor(dsn):
-    engine = sqlalchemy.create_engine(dsn, isolation_level='READ UNCOMMITTED')
+def get_executor(dbUrl):
+    engine = sqlalchemy.create_engine(dbUrl, isolation_level='READ UNCOMMITTED')
     connection = engine.connect()
     return connection.execute
 
-def get_info():
-    parser = argparse.ArgumentParser(description='Send SQL results to Graphite')
-    parser.add_argument('--graphite-host', metavar='graphite-host', type=str, nargs=1, default=None, help='Host to send metrics to')
-    parser.add_argument('--graphite-port', metavar='graphite-port', type=int, nargs=1, default=2003, help='Graphite port to send metrics to')
-    parser.add_argument('--graphite-prefix', metavar='graphite-prefix', type=str, nargs=1, default=['db'], help='Prefix for metrics')
-    return parser.parse_args()
-
-def run(graphite_host, graphite_port, graphite_prefix, queries, executor):
-    data = []
+def run(graphite_host, graphite_port, graphite_prefix, executor , **query):
+    resultRow = []
     now = time.time()
     sock = _socket_for_host_port(graphite_host, graphite_port)
-    data = map(executor, queries)
-    for result in data:
-        for line in result:
-            metric, value = line[:2]
-            metric = '{0}.{1} {2} {3}\n'.format(graphite_prefix, metric, value, now)
-            print metric,
-            sock.sendall(metric)
+    resultRow = executor(query['sql'])
+    for result in resultRow:
+        metric, value = result[:2]
+        metric = '{0}.{1} {2} {3}\n'.format(graphite_prefix, metric, value, now)
+        print metric,
+        sock.sendall(metric)
     sock.close()
 
 def _socket_for_host_port(host, port):
@@ -40,20 +33,40 @@ def _socket_for_host_port(host, port):
 
 
 def main():
-    dsn = os.environ.get('S2G_DSN')
-    if dsn is None:
-        print 'You must set your DSN in the environment variable `S2G_DSN`'
+    graphiteHost = os.environ.get('SQL_FEED_GRAPHITE_HOST')
+    if graphiteHost is None:
+        graphiteHost = 'localhost'
+    graphitePort = os.environ.get('SQL_FEED_GRAPHITE_PORT')
+    if graphitePort is None:
+        graphitePort = 5432
+    graphitePrefix = os.environ.get('SQL_FEED_GRAPHITE_PREFIX')
+    if graphitePrefix is None:
+        print 'You must set your graphitePrefix in the environment variable `SQL_FEED_GRAPHITE_PREFIX`'
         sys.exit(1)
-
-    queries = sys.stdin.readlines()
-    args = get_info()
-    run(
-        args.graphite_host[0],
-        args.graphite_port,
-        args.graphite_prefix[0],
-        queries,
-        get_executor(dsn),
-    )
+    dbUrl = os.environ.get('SQL_FEED_GRAPHITE_DB_URL')
+    if dbUrl is None:
+        print 'You must set your DBUrl in the environment variable `SQL_FEED_GRAPHITE_DB_URL`'
+        sys.exit(1)
+    queriesDIR = os.environ.get('SQL_FEED_GRAPHITE_QUERIES_DIR')
+    if queriesDIR is None:
+        queriesDIR = os.getcwd()
+    for filename in os.listdir(queriesDIR):
+        if filename.endswith(".json"): 
+            currentFile = os.path.join(queriesDIR, filename)
+            print('Processing file',currentFile)
+            with open(currentFile) as data_file:    
+                data = json.load(data_file)
+                print(data["queries"])
+                for query in data["queries"]:
+                    print(query['sql'])
+                    run(
+                        graphiteHost,
+                        graphitePort,
+                        graphitePrefix,
+                        get_executor(dbUrl),
+                        **query
+                    )
+            continue
 
 if __name__ == '__main__':
     main()

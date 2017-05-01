@@ -1,0 +1,12 @@
+{
+    "queries": [
+        {
+            "id": "user1",
+            "sql": "SELECT 'metric', 1+1;"
+        },
+        {
+            "id": "user2",
+            "sql": "SELECT 'metric', 1+1;"
+        }
+    ]
+}
