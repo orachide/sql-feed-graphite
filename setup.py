@@ -6,7 +6,7 @@ def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 def run_setup():
-	setup(
+    setup(
 	  name='sqlfeedgraphite',
 	  version='0.2',
 	  description='https://github.com/orachide/sql-feed-graphite',
@@ -25,6 +25,10 @@ def run_setup():
 	  zip_safe=True,
 	  classifiers=[
 	   ],
+      entry_points="""
+      [console_scripts]
+      sqlfeedgraphite=sqlfeedgraphite:main
+      """,
 	)
 if __name__ == '__main__':
     run_setup()
