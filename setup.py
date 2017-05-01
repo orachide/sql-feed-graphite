@@ -7,7 +7,7 @@ def read(fname):
 
 def run_setup():
     setup(
-	  name='sqlfeedgraphite',
+	  name='sql-feed-graphite',
 	  version='0.2',
 	  description='https://github.com/orachide/sql-feed-graphite',
 	  keywords = 'SQL Graphite Metrics',
@@ -16,7 +16,7 @@ def run_setup():
 	  author='Rachide Ouattara',
 	  author_email='ouattchidi@gmail.com',
 	  license='BSD',
-	  packages=['sqlfeedgraphite'],
+	  packages=['sql_feed_graphite'],
 	  install_requires=[
 		    'sqlalchemy',
 		    'psycopg2',
@@ -27,7 +27,7 @@ def run_setup():
 	   ],
       entry_points="""
       [console_scripts]
-      sqlfeedgraphite=sqlfeedgraphite:main
+      sql-feed-graphite=sql_feed_graphite:main
       """,
 	)
 if __name__ == '__main__':
