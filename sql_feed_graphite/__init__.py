@@ -67,6 +67,15 @@ def main():
                         **query
                     )
             continue
+        
+def excepthook(type, value, tb):
+    # you can log the exception to a file here
+    print ('ERROR:',type,value)
+
+    # the following line does the default (prints it to err)
+    sys.__excepthook__(type, value, tb)
+
+sys.excepthook = excepthook
 
 if __name__ == '__main__':
     main()
