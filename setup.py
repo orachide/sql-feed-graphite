@@ -8,11 +8,11 @@ def read(fname):
 def run_setup():
     setup(
 	  name='sql-feed-graphite',
-	  version='0.2',
+	  version='0.3',
 	  description='https://github.com/orachide/sql-feed-graphite',
 	  keywords = 'SQL Graphite Metrics',
 	  url='https://github.com/orachide/sql-feed-graphite',
-	  download_url = 'https://github.com/orachide/sql-feed-graphite/archive/0.2.tar.gz',
+	  download_url = 'https://github.com/orachide/sql-feed-graphite/archive/0.3.tar.gz',
 	  author='Rachide Ouattara',
 	  author_email='ouattchidi@gmail.com',
 	  license='BSD',

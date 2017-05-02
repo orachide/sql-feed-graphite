@@ -38,7 +38,7 @@ def main():
         graphiteHost = 'localhost'
     graphitePort = os.environ.get('SQL_FEED_GRAPHITE_PORT')
     if graphitePort is None:
-        graphitePort = 5432
+        graphitePort = 2003
     graphitePrefix = os.environ.get('SQL_FEED_GRAPHITE_PREFIX')
     if graphitePrefix is None:
         print 'You must set your graphitePrefix in the environment variable `SQL_FEED_GRAPHITE_PREFIX`'
